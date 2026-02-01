@@ -1,0 +1,130 @@
+{
+  "colors": {
+    "palettes": {
+      "teal": {
+        "primary": "172 66% 40%",
+        "primaryHover": "172 66% 35%",
+        "primaryMuted": "172 40% 92%",
+        "accent": "172 40% 92%",
+        "accentForeground": "172 66% 30%",
+        "ring": "172 66% 40%"
+      },
+      "cobalt": {
+        "primary": "217 91% 50%",
+        "primaryHover": "217 91% 45%",
+        "primaryMuted": "217 60% 92%",
+        "accent": "217 60% 92%",
+        "accentForeground": "217 91% 40%",
+        "ring": "217 91% 50%"
+      },
+      "burntOrange": {
+        "primary": "24 85% 52%",
+        "primaryHover": "24 85% 47%",
+        "primaryMuted": "24 50% 92%",
+        "accent": "24 50% 92%",
+        "accentForeground": "24 85% 42%",
+        "ring": "24 85% 52%"
+      }
+    },
+    "light": {
+      "background": "40 20% 98%",
+      "foreground": "30 10% 12%",
+      "card": "0 0% 100%",
+      "cardForeground": "30 10% 12%",
+      "popover": "0 0% 100%",
+      "popoverForeground": "30 10% 12%",
+      "secondary": "30 15% 94%",
+      "secondaryForeground": "30 10% 25%",
+      "muted": "30 15% 94%",
+      "mutedForeground": "30 8% 45%",
+      "border": "30 15% 88%",
+      "input": "30 15% 88%"
+    },
+    "dark": {
+      "background": "30 10% 8%",
+      "foreground": "30 15% 95%",
+      "card": "30 10% 12%",
+      "cardForeground": "30 15% 95%",
+      "popover": "30 10% 12%",
+      "popoverForeground": "30 15% 95%",
+      "secondary": "30 8% 18%",
+      "secondaryForeground": "30 15% 90%",
+      "muted": "30 8% 18%",
+      "mutedForeground": "30 10% 60%",
+      "border": "30 8% 22%",
+      "input": "30 8% 22%"
+    },
+    "semantic": {
+      "success": "152 60% 42%",
+      "successForeground": "0 0% 100%",
+      "successMuted": "152 40% 92%",
+      "warning": "38 92% 50%",
+      "warningForeground": "30 10% 12%",
+      "warningMuted": "38 60% 92%",
+      "destructive": "0 72% 51%",
+      "destructiveForeground": "0 0% 100%",
+      "destructiveMuted": "0 50% 95%",
+      "info": "200 75% 50%",
+      "infoForeground": "0 0% 100%",
+      "infoMuted": "200 50% 92%"
+    }
+  },
+  "typography": {
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "sizes": {
+      "h1": { "fontSize": "3rem", "lineHeight": "1.25", "fontWeight": "700" },
+      "h2": { "fontSize": "2.25rem", "lineHeight": "1.1", "fontWeight": "700" },
+      "h3": { "fontSize": "1.5rem", "lineHeight": "1.33", "fontWeight": "600" },
+      "body": { "fontSize": "1rem", "lineHeight": "1.5", "fontWeight": "400" },
+      "bodyLarge": { "fontSize": "1.125rem", "lineHeight": "1.55", "fontWeight": "400" },
+      "caption": { "fontSize": "0.75rem", "lineHeight": "1.33", "fontWeight": "400" },
+      "small": { "fontSize": "0.875rem", "lineHeight": "1.43", "fontWeight": "400" }
+    }
+  },
+  "spacing": {
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "5": "1.25rem",
+    "6": "1.5rem",
+    "8": "2rem",
+    "10": "2.5rem",
+    "12": "3rem",
+    "16": "4rem",
+    "20": "5rem",
+    "24": "6rem"
+  },
+  "borderRadius": {
+    "sm": "0.5rem",
+    "md": "0.625rem",
+    "lg": "0.75rem",
+    "xl": "0.875rem",
+    "2xl": "1rem",
+    "3xl": "1.5rem",
+    "full": "9999px"
+  },
+  "shadows": {
+    "sm": "0 1px 2px 0 hsl(30 10% 12% / 0.04)",
+    "DEFAULT": "0 1px 3px 0 hsl(30 10% 12% / 0.08), 0 1px 2px -1px hsl(30 10% 12% / 0.08)",
+    "md": "0 4px 6px -1px hsl(30 10% 12% / 0.08), 0 2px 4px -2px hsl(30 10% 12% / 0.08)",
+    "lg": "0 10px 15px -3px hsl(30 10% 12% / 0.08), 0 4px 6px -4px hsl(30 10% 12% / 0.08)",
+    "xl": "0 20px 25px -5px hsl(30 10% 12% / 0.08), 0 8px 10px -6px hsl(30 10% 12% / 0.08)"
+  },
+  "transitions": {
+    "fast": "120ms",
+    "normal": "180ms",
+    "slow": "300ms",
+    "easing": {
+      "in": "cubic-bezier(0.4, 0, 1, 1)",
+      "out": "cubic-bezier(0, 0, 0.2, 1)",
+      "inOut": "cubic-bezier(0.4, 0, 0.2, 1)"
+    }
+  },
+  "accessibility": {
+    "minHitTarget": "44px",
+    "focusRingWidth": "2px",
+    "focusRingOffset": "2px",
+    "contrastRequirement": "WCAG AA (4.5:1 for normal text, 3:1 for large text)"
+  }
+}

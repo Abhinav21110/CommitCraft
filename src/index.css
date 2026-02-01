@@ -1,0 +1,284 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+GitHub Activity Booster Design System
+=====================================
+Warm minimalist design with high contrast and accessibility focus.
+NO PURPLE - Using teal as primary accent.
+
+Three Accent Palette Options (swap --primary HSL values):
+1. Teal (Default): 172 66% 40% - Calm, trustworthy, modern
+2. Cobalt Blue: 217 91% 50% - Professional, confident
+3. Burnt Orange: 24 85% 52% - Energetic, warm, distinctive
+
+All palettes pass WCAG AA contrast requirements.
+*/
+
+@layer base {
+  :root {
+    /* Base neutral palette - warm gray */
+    --background: 40 20% 98%;
+    --foreground: 30 10% 12%;
+
+    /* Cards and surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 30 10% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 10% 12%;
+
+    /* Primary accent - Teal (swap for other palettes) */
+    --primary: 172 66% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 172 66% 35%;
+    --primary-muted: 172 40% 92%;
+
+    /* Secondary accent */
+    --secondary: 30 15% 94%;
+    --secondary-foreground: 30 10% 25%;
+
+    /* Muted elements */
+    --muted: 30 15% 94%;
+    --muted-foreground: 30 8% 45%;
+
+    /* Accent for highlights */
+    --accent: 172 40% 92%;
+    --accent-foreground: 172 66% 30%;
+
+    /* Semantic colors */
+    --success: 152 60% 42%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 152 40% 92%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 30 10% 12%;
+    --warning-muted: 38 60% 92%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-muted: 0 50% 95%;
+
+    /* Info color */
+    --info: 200 75% 50%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 200 50% 92%;
+
+    /* Borders and inputs */
+    --border: 30 15% 88%;
+    --input: 30 15% 88%;
+    --ring: 172 66% 40%;
+
+    /* Border radius */
+    --radius: 0.75rem;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(30 10% 12% / 0.04);
+    --shadow: 0 1px 3px 0 hsl(30 10% 12% / 0.08), 0 1px 2px -1px hsl(30 10% 12% / 0.08);
+    --shadow-md: 0 4px 6px -1px hsl(30 10% 12% / 0.08), 0 2px 4px -2px hsl(30 10% 12% / 0.08);
+    --shadow-lg: 0 10px 15px -3px hsl(30 10% 12% / 0.08), 0 4px 6px -4px hsl(30 10% 12% / 0.08);
+    --shadow-xl: 0 20px 25px -5px hsl(30 10% 12% / 0.08), 0 8px 10px -6px hsl(30 10% 12% / 0.08);
+
+    /* Sidebar tokens */
+    --sidebar-background: 30 15% 97%;
+    --sidebar-foreground: 30 10% 25%;
+    --sidebar-primary: 172 66% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 172 40% 92%;
+    --sidebar-accent-foreground: 172 66% 30%;
+    --sidebar-border: 30 15% 88%;
+    --sidebar-ring: 172 66% 40%;
+  }
+
+  .dark {
+    /* Dark mode - deep charcoal */
+    --background: 30 10% 8%;
+    --foreground: 30 15% 95%;
+
+    --card: 30 10% 12%;
+    --card-foreground: 30 15% 95%;
+
+    --popover: 30 10% 12%;
+    --popover-foreground: 30 15% 95%;
+
+    /* Primary stays vibrant in dark mode */
+    --primary: 172 66% 50%;
+    --primary-foreground: 30 10% 8%;
+    --primary-hover: 172 66% 55%;
+    --primary-muted: 172 30% 18%;
+
+    --secondary: 30 8% 18%;
+    --secondary-foreground: 30 15% 90%;
+
+    --muted: 30 8% 18%;
+    --muted-foreground: 30 10% 60%;
+
+    --accent: 172 30% 18%;
+    --accent-foreground: 172 66% 60%;
+
+    /* Semantic colors - adjusted for dark */
+    --success: 152 60% 50%;
+    --success-foreground: 30 10% 8%;
+    --success-muted: 152 30% 15%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 30 10% 8%;
+    --warning-muted: 38 40% 15%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-muted: 0 40% 15%;
+
+    --info: 200 75% 55%;
+    --info-foreground: 30 10% 8%;
+    --info-muted: 200 40% 15%;
+
+    --border: 30 8% 22%;
+    --input: 30 8% 22%;
+    --ring: 172 66% 50%;
+
+    /* Dark shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
+    --shadow: 0 1px 3px 0 hsl(0 0% 0% / 0.3), 0 1px 2px -1px hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.3), 0 4px 6px -4px hsl(0 0% 0% / 0.3);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.3), 0 8px 10px -6px hsl(0 0% 0% / 0.3);
+
+    /* Sidebar dark */
+    --sidebar-background: 30 10% 10%;
+    --sidebar-foreground: 30 15% 90%;
+    --sidebar-primary: 172 66% 50%;
+    --sidebar-primary-foreground: 30 10% 8%;
+    --sidebar-accent: 172 30% 18%;
+    --sidebar-accent-foreground: 172 66% 60%;
+    --sidebar-border: 30 8% 22%;
+    --sidebar-ring: 172 66% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  /* Focus states for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer components {
+  /* Glass effect for cards */
+  .glass {
+    @apply bg-card/80 backdrop-blur-sm;
+  }
+
+  /* Gradient text using primary accent */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-accent-foreground bg-clip-text text-transparent;
+  }
+
+  /* Hover scale animation */
+  .hover-lift {
+    @apply transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md;
+  }
+
+  /* Subtle card hover */
+  .card-hover {
+    @apply transition-all duration-200 ease-out hover:shadow-lg hover:border-primary/20;
+  }
+
+  /* Progress bar animation */
+  .progress-animate {
+    animation: progress-pulse 2s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  /* Animation keyframes */
+  @keyframes progress-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes scale-in {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.4s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .animate-slide-in {
+    animation: slide-in-right 0.3s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.2s ease-out;
+  }
+
+  /* Stagger animations for lists */
+  .stagger-1 { animation-delay: 50ms; }
+  .stagger-2 { animation-delay: 100ms; }
+  .stagger-3 { animation-delay: 150ms; }
+  .stagger-4 { animation-delay: 200ms; }
+  .stagger-5 { animation-delay: 250ms; }
+}
+
+/*
+===========================================
+ALTERNATE PALETTE OPTIONS (Replace --primary values in :root)
+===========================================
+
+COBALT BLUE PALETTE:
+--primary: 217 91% 50%;
+--primary-foreground: 0 0% 100%;
+--primary-hover: 217 91% 45%;
+--primary-muted: 217 60% 92%;
+--accent: 217 60% 92%;
+--accent-foreground: 217 91% 40%;
+--ring: 217 91% 50%;
+
+BURNT ORANGE PALETTE:
+--primary: 24 85% 52%;
+--primary-foreground: 0 0% 100%;
+--primary-hover: 24 85% 47%;
+--primary-muted: 24 50% 92%;
+--accent: 24 50% 92%;
+--accent-foreground: 24 85% 42%;
+--ring: 24 85% 52%;
+
+===========================================
+*/

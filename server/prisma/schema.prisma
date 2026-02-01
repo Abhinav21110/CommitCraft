@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid())
+  githubId        String    @unique
+  username        String
+  email           String?
+  avatarUrl       String?
+  accessToken     String    // Encrypted GitHub access token
+  refreshToken    String?   // Encrypted refresh token
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  repos           Repo[]
+  commitSchedules CommitSchedule[]
+  commits         Commit[]
+}
+
+model Repo {
+  id              String    @id @default(uuid())
+  githubRepoId    String?   @unique
+  name            String
+  fullName        String
+  description     String?
+  private         Boolean   @default(false)
+  defaultBranch   String    @default("main")
+  htmlUrl         String?
+  cloneUrl        String?
+  userId          String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commits         Commit[]
+  schedules       CommitSchedule[]
+  
+  @@index([userId])
+}
+
+model Commit {
+  id              String    @id @default(uuid())
+  sha             String?
+  message         String
+  description     String?
+  author          String
+  repoId          String
+  userId          String
+  status          String    @default("pending") // pending, committed, failed
+  scheduledFor    DateTime?
+  committedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  repo            Repo      @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([repoId])
+  @@index([userId])
+  @@index([status])
+}
+
+model CommitSchedule {
+  id              String    @id @default(uuid())
+  repoId          String
+  userId          String
+  frequency       String    // daily, hourly, custom (cron expression)
+  cronExpression  String?   // Custom cron expression
+  commitsPerRun   Int       @default(1) // Number of commits to make per scheduled run
+  enabled         Boolean   @default(true)
+  lastRunAt       DateTime?
+  nextRunAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  repo            Repo      @relation(fields: [repoId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([repoId])
+  @@index([userId])
+  @@index([enabled])
+}
