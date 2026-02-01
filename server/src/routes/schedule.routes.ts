@@ -25,4 +25,7 @@ router.delete('/:id', scheduleController.deleteSchedule.bind(scheduleController)
 // POST /api/schedules/:id/toggle - Toggle schedule enabled/disabled
 router.post('/:id/toggle', scheduleController.toggleSchedule.bind(scheduleController));
 
+// POST /api/schedules/:id/execute - Execute schedule immediately
+router.post('/:id/execute', scheduleController.executeSchedule.bind(scheduleController));
+
 export default router;

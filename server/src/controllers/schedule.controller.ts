@@ -164,6 +164,41 @@ export class ScheduleController {
       next(error);
     }
   }
+
+  async executeSchedule(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const userId = req.user!.userId;
+
+      console.log(`📋 Executing schedule ${id} for user ${userId}`);
+
+      const schedule = await prisma.commitSchedule.findFirst({
+        where: { id, userId },
+        include: {
+          repo: true,
+          user: true,
+        },
+      });
+
+      if (!schedule) {
+        console.log(`❌ Schedule ${id} not found`);
+        res.status(404).json({ error: 'Schedule not found' });
+        return;
+      }
+
+      console.log(`✅ Found schedule, executing ${schedule.commitsPerRun} commits...`);
+
+      // Execute the scheduled commits immediately
+      await schedulerService.executeScheduledCommits(schedule);
+
+      console.log(`✅ Schedule ${id} executed successfully`);
+
+      res.json({ message: 'Schedule executed successfully', commitsCreated: schedule.commitsPerRun });
+    } catch (error) {
+      console.error(`❌ Error executing schedule:`, error);
+      next(error);
+    }
+  }
 }
 
 export const scheduleController = new ScheduleController();

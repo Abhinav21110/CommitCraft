@@ -51,7 +51,7 @@ class SchedulerService {
     }
   }
 
-  private async executeScheduledCommits(schedule: any) {
+  async executeScheduledCommits(schedule: any) {
     console.log(`🚀 Executing scheduled commits for schedule ${schedule.id}`);
 
     try {

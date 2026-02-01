@@ -132,6 +132,7 @@ export default function Dashboard() {
   // Real data from API
   const [realCommits, setRealCommits] = useState<CommitEntry[]>([]);
   const [realFiles, setRealFiles] = useState<FileNode[]>([]);
+  const [repoStats, setRepoStats] = useState({ commits: 0, files: 0, branches: 1 });
 
   // Logs
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -157,6 +158,7 @@ export default function Dashboard() {
           status: index === 0 ? 'completed' as const : undefined,
         }));
         setRealCommits(formattedCommits);
+        setRepoStats(prev => ({ ...prev, commits: formattedCommits.length }));
       }
 
       // Fetch repository contents
@@ -174,6 +176,7 @@ export default function Dashboard() {
             }))
           : [];
         setRealFiles(formattedFiles);
+        setRepoStats(prev => ({ ...prev, files: formattedFiles.length }));
       }
     } catch (error) {
       console.error('Failed to fetch repo data:', error);
@@ -202,6 +205,9 @@ export default function Dashboard() {
 
   const handleConfirmRun = useCallback(async () => {
     if (!user) return;
+    
+    // Prevent duplicate runs
+    if (runComplete || isConfirming) return;
 
     setIsConfirming(true);
     setShowConfirmModal(false);
@@ -287,14 +293,53 @@ export default function Dashboard() {
         throw new Error('Failed to create schedule');
       }
 
+      const { schedule } = await scheduleResponse.json();
+
+      // Trigger immediate execution of scheduled commits
       setLogs((prev) => [
         ...prev,
         {
           id: "4",
           timestamp: new Date().toLocaleTimeString(),
-          message: "Schedule created successfully!",
-          type: "success",
+          message: "Creating initial commits...",
+          type: "loading",
         },
+      ]);
+
+      const executeResponse = await fetch(`http://localhost:3000/api/schedules/${schedule.id}/execute`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (executeResponse.ok) {
+        setLogs((prev) => [
+          ...prev.slice(0, -1), // Remove the loading message
+          {
+            id: "4",
+            timestamp: new Date().toLocaleTimeString(),
+            message: "Initial commits created!",
+            type: "success",
+          },
+        ]);
+        
+        // Fetch updated data
+        setTimeout(() => fetchRepoData(repo.id), 3000);
+      } else {
+        setLogs((prev) => [
+          ...prev.slice(0, -1), // Remove the loading message
+          {
+            id: "4",
+            timestamp: new Date().toLocaleTimeString(),
+            message: "Failed to create initial commits",
+            type: "error",
+          },
+        ]);
+      }
+
+      setLogs((prev) => [
+        ...prev,
         {
           id: "5",
           timestamp: new Date().toLocaleTimeString(),
@@ -526,15 +571,15 @@ export default function Dashboard() {
                   </h3>
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <p className="text-2xl font-bold text-foreground">{commitCount}</p>
+                      <p className="text-2xl font-bold text-foreground">{repoStats.commits}</p>
                       <p className="text-xs text-muted-foreground">Commits</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-foreground">12</p>
+                      <p className="text-2xl font-bold text-foreground">{repoStats.files}</p>
                       <p className="text-xs text-muted-foreground">Files</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-foreground">1</p>
+                      <p className="text-2xl font-bold text-foreground">{repoStats.branches}</p>
                       <p className="text-xs text-muted-foreground">Branch</p>
                     </div>
                   </div>
