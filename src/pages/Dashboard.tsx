@@ -1,4 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Header } from "@/components/layout/Header";
@@ -100,6 +102,15 @@ const mockCommits: CommitEntry[] = [
 ];
 
 export default function Dashboard() {
+  const { user, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, loading, navigate]);
+
   // Settings state
   const [repoName, setRepoName] = useState("my-awesome-project");
   const [isPrivate, setIsPrivate] = useState(false);
@@ -215,12 +226,24 @@ export default function Dashboard() {
     ]);
   }, []);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header 
         isLoggedIn={true} 
-        username="johndoe" 
-        avatarUrl="https://github.com/ghost.png" 
+        username={user.username} 
+        avatarUrl={user.avatarUrl || "https://github.com/ghost.png"} 
       />
 
       <main className="flex-1 container py-8">
@@ -346,7 +369,7 @@ export default function Dashboard() {
                   <Button
                     variant="success"
                     className="flex-1 gap-2"
-                    onClick={() => window.open(`https://github.com/johndoe/${repoName}`, "_blank")}
+                    onClick={() => window.open(`https://github.com/${user.username}/${repoName}`, "_blank")}
                   >
                     <ExternalLink className="w-4 h-4" />
                     Open repository

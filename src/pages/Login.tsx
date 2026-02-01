@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
+import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -11,16 +13,29 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { GitHubIcon } from "@/components/icons/Icons";
-import { Shield, CheckCircle2, ExternalLink, ArrowRight } from "lucide-react";
+import { Shield, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function Login() {
   const [showScopes, setShowScopes] = useState(false);
-  
-  // Mock: check if user has an existing session
-  const hasExistingSession = false;
-  const existingUser = {
-    username: "johndoe",
-    avatarUrl: "https://github.com/ghost.png",
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const error = searchParams.get('error');
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogin = () => {
+    login();
+  };
+
+  const errorMessages: Record<string, string> = {
+    auth_failed: 'Authentication failed. Please try again.',
+    no_user: 'Could not retrieve user information.',
+    no_token: 'No authentication token received.',
   };
 
   const scopes = [
@@ -30,9 +45,14 @@ export default function Login() {
       reason: "Required to create repositories and push commits",
     },
     {
-      name: "read:user",
-      description: "Read access to profile data",
-      reason: "To display your username and avatar",
+      name: "user:email",
+      description: "Read access to user email",
+      reason: "To display your email and profile information",
+    },
+    {
+      name: "write:repo_hook",
+      description: "Write repository hooks",
+      reason: "For advanced repository management features",
     },
   ];
 
@@ -42,52 +62,28 @@ export default function Login() {
 
       <main className="flex-1 flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md animate-fade-up">
-          {/* Main Card */}
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {errorMessages[error] || 'An error occurred during authentication.'}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="rounded-3xl border border-border bg-card p-8 shadow-soft-lg">
-            {/* Header */}
             <div className="text-center mb-8">
               <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-muted mx-auto mb-4">
                 <Shield className="w-8 h-8 text-primary" />
               </div>
               <h1 className="text-2xl font-bold text-foreground mb-2">
-                Sign in to ActivityBoost
+                Sign in to Commit Craft
               </h1>
               <p className="text-muted-foreground">
                 Connect your GitHub account to get started
               </p>
             </div>
 
-            {/* Existing Session */}
-            {hasExistingSession && (
-              <div className="mb-6 p-4 rounded-2xl bg-secondary/50 border border-border">
-                <div className="flex items-center gap-3 mb-3">
-                  <img
-                    src={existingUser.avatarUrl}
-                    alt={existingUser.username}
-                    className="w-10 h-10 rounded-full ring-2 ring-background"
-                  />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Welcome back, {existingUser.username}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      You have an existing session
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="default" size="sm" className="flex-1 gap-2">
-                    Continue
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    Switch account
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* OAuth Scopes Info */}
             <div className="mb-6 p-4 rounded-2xl bg-secondary/30 space-y-3">
               <p className="text-sm text-muted-foreground">
                 We'll request the following permissions:
@@ -118,7 +114,7 @@ export default function Login() {
                   <DialogHeader>
                     <DialogTitle>Why we request these permissions</DialogTitle>
                     <DialogDescription>
-                      ActivityBoost needs specific GitHub permissions to work properly.
+                      Commit Craft needs specific GitHub permissions to work properly.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 pt-4">
@@ -145,13 +141,15 @@ export default function Login() {
               </Dialog>
             </div>
 
-            {/* Sign In Button */}
-            <Button variant="github" className="w-full h-12 text-base gap-2">
+            <Button 
+              variant="github" 
+              className="w-full h-12 text-base gap-2"
+              onClick={handleLogin}
+            >
               <GitHubIcon className="w-5 h-5" />
               Sign in with GitHub
             </Button>
 
-            {/* Trust Footer */}
             <p className="mt-6 text-center text-xs text-muted-foreground">
               By signing in, you agree to our{" "}
               <Link to="/terms" className="text-primary hover:underline">
@@ -164,7 +162,6 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Security Note */}
           <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <Shield className="w-4 h-4" />
             <span>Secured with OAuth 2.0 — We never see your password</span>
