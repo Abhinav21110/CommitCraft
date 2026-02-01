@@ -32,7 +32,7 @@ export function Header({ isLoggedIn = false, username, avatarUrl }: HeaderProps)
             </svg>
           </div>
           <span className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors duration-180">
-            ActivityBoost
+            CommitCraft
           </span>
         </Link>
 

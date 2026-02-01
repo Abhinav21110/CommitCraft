@@ -205,4 +205,32 @@ export class GitHubService {
       throw new Error(`Failed to delete repository: ${error.message}`);
     }
   }
+
+  async getRepositoryContents(owner: string, repo: string, path: string = '') {
+    try {
+      const response = await this.octokit.repos.getContent({
+        owner,
+        repo,
+        path,
+      });
+
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to get repository contents: ${error.message}`);
+    }
+  }
+
+  async listCommits(owner: string, repo: string, perPage: number = 20) {
+    try {
+      const response = await this.octokit.repos.listCommits({
+        owner,
+        repo,
+        per_page: perPage,
+      });
+
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to list commits: ${error.message}`);
+    }
+  }
 }

@@ -57,7 +57,7 @@ export function Footer() {
         {/* Trust Statement */}
         <div className="mt-6 pt-6 border-t border-border">
           <p className="text-center text-xs text-muted-foreground max-w-2xl mx-auto">
-            ActivityBoost uses secure OAuth authentication and only requests the minimum permissions needed.
+            CommitCraft uses secure OAuth authentication and only requests the minimum permissions needed.
             We never store your GitHub password. All repository actions are previewed before execution.
           </p>
         </div>

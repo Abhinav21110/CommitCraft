@@ -208,6 +208,55 @@ export class RepoController {
       next(error);
     }
   }
+
+  async getRepoContents(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const userId = req.user!.userId;
+      const path = (req.query.path as string) || '';
+
+      const repo = await prisma.repo.findFirst({
+        where: { id, userId },
+      });
+
+      if (!repo) {
+        res.status(404).json({ error: 'Repository not found' });
+        return;
+      }
+
+      const githubService = await GitHubService.forUser(userId);
+      const [owner, repoName] = repo.fullName.split('/');
+      const contents = await githubService.getRepositoryContents(owner, repoName, path);
+
+      res.json({ contents });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getRepoCommits(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const userId = req.user!.userId;
+
+      const repo = await prisma.repo.findFirst({
+        where: { id, userId },
+      });
+
+      if (!repo) {
+        res.status(404).json({ error: 'Repository not found' });
+        return;
+      }
+
+      const githubService = await GitHubService.forUser(userId);
+      const [owner, repoName] = repo.fullName.split('/');
+      const commits = await githubService.listCommits(owner, repoName, 20);
+
+      res.json({ commits });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const repoController = new RepoController();

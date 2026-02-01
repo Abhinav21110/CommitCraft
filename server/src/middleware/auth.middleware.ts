@@ -11,6 +11,7 @@ export const authenticate = (
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('Auth failed: No token provided. Header:', authHeader);
       res.status(401).json({ error: 'No token provided' });
       return;
     }
@@ -19,6 +20,7 @@ export const authenticate = (
     const payload = TokenService.verifyToken(token);
 
     if (!payload) {
+      console.log('Auth failed: Invalid or expired token');
       res.status(401).json({ error: 'Invalid or expired token' });
       return;
     }
@@ -26,6 +28,7 @@ export const authenticate = (
     (req as AuthenticatedRequest).user = payload;
     next();
   } catch (error) {
+    console.log('Auth failed: Exception:', error);
     res.status(401).json({ error: 'Authentication failed' });
   }
 };

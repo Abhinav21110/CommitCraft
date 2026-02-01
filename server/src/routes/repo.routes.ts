@@ -19,6 +19,12 @@ router.get('/sync', repoController.syncRepos.bind(repoController));
 // GET /api/repos/:id - Get repository details
 router.get('/:id', repoController.getRepo.bind(repoController));
 
+// GET /api/repos/:id/contents - Get repository contents
+router.get('/:id/contents', repoController.getRepoContents.bind(repoController));
+
+// GET /api/repos/:id/commits - Get repository commits
+router.get('/:id/commits', repoController.getRepoCommits.bind(repoController));
+
 // DELETE /api/repos/:id - Delete a repository
 router.delete('/:id', repoController.deleteRepo.bind(repoController));
 

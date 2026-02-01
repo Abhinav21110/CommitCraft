@@ -126,78 +126,198 @@ export default function Dashboard() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [runComplete, setRunComplete] = useState(false);
+  const [createdRepoUrl, setCreatedRepoUrl] = useState<string>("");
+  const [createdRepoId, setCreatedRepoId] = useState<string>("");
+
+  // Real data from API
+  const [realCommits, setRealCommits] = useState<CommitEntry[]>([]);
+  const [realFiles, setRealFiles] = useState<FileNode[]>([]);
 
   // Logs
   const [logs, setLogs] = useState<LogEntry[]>([]);
+
+  const fetchRepoData = useCallback(async (repoId: string) => {
+    try {
+      const token = localStorage.getItem('authToken');
+
+      // Fetch commits
+      const commitsResponse = await fetch(`http://localhost:3000/api/repos/${repoId}/commits`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      
+      if (commitsResponse.ok) {
+        const { commits: githubCommits } = await commitsResponse.json();
+        const formattedCommits: CommitEntry[] = githubCommits.map((commit: any, index: number) => ({
+          id: commit.sha,
+          message: commit.commit.message,
+          type: commit.commit.message.includes('feat') ? 'feat' as const : 
+                commit.commit.message.includes('fix') ? 'fix' as const : 'feat' as const,
+          file: commit.files?.[0]?.filename || 'multiple files',
+          timestamp: new Date(commit.commit.author.date).toLocaleString(),
+          status: index === 0 ? 'completed' as const : undefined,
+        }));
+        setRealCommits(formattedCommits);
+      }
+
+      // Fetch repository contents
+      const contentsResponse = await fetch(`http://localhost:3000/api/repos/${repoId}/contents`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      
+      if (contentsResponse.ok) {
+        const { contents } = await contentsResponse.json();
+        const formattedFiles: FileNode[] = Array.isArray(contents) 
+          ? contents.map((item: any) => ({
+              name: item.name,
+              type: item.type === 'dir' ? 'folder' as const : 'file' as const,
+              path: item.path,
+            }))
+          : [];
+        setRealFiles(formattedFiles);
+      }
+    } catch (error) {
+      console.error('Failed to fetch repo data:', error);
+    }
+  }, []);
+
+  // Poll for updates when repo is created
+  useEffect(() => {
+    if (!createdRepoId) return;
+
+    // Initial fetch
+    fetchRepoData(createdRepoId);
+
+    // Poll every 30 seconds for updates
+    const interval = setInterval(() => {
+      fetchRepoData(createdRepoId);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [createdRepoId, fetchRepoData]);
 
   const handlePreview = useCallback(() => {
     // In real app, this would fetch preview data from API
     console.log("Preview requested");
   }, []);
 
-  const handleConfirmRun = useCallback(() => {
+  const handleConfirmRun = useCallback(async () => {
+    if (!user) return;
+
     setIsConfirming(true);
-    setTimeout(() => {
-      setIsConfirming(false);
-      setShowConfirmModal(false);
-      setIsRunning(true);
-      setProgress(0);
+    setShowConfirmModal(false);
+
+    try {
+      // Create repository
       setLogs([
         {
           id: "1",
           timestamp: new Date().toLocaleTimeString(),
-          message: "Starting repository creation...",
+          message: "Creating repository on GitHub...",
           type: "loading",
         },
       ]);
 
-      // Simulate progress
-      let currentProgress = 0;
-      const interval = setInterval(() => {
-        if (currentProgress >= 100) {
-          clearInterval(interval);
-          setIsRunning(false);
-          setRunComplete(true);
-          setLogs((prev) => [
-            ...prev,
-            {
-              id: String(prev.length + 1),
-              timestamp: new Date().toLocaleTimeString(),
-              message: "All commits completed successfully!",
-              type: "success",
-            },
-          ]);
-          return;
-        }
-        currentProgress += Math.random() * 15;
-        if (currentProgress > 100) currentProgress = 100;
-        setProgress(currentProgress);
-        
-        if (currentProgress > 30 && currentProgress < 35) {
-          setLogs((prev) => [
-            ...prev,
-            {
-              id: String(prev.length + 1),
-              timestamp: new Date().toLocaleTimeString(),
-              message: "Repository created: " + repoName,
-              type: "success",
-            },
-          ]);
-        }
-        if (currentProgress > 60 && currentProgress < 65) {
-          setLogs((prev) => [
-            ...prev,
-            {
-              id: String(prev.length + 1),
-              timestamp: new Date().toLocaleTimeString(),
-              message: "Pushing commits... (15/" + commitCount + ")",
-              type: "info",
-            },
-          ]);
-        }
-      }, 500);
-    }, 1500);
-  }, [repoName, commitCount]);
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please log in again.');
+      }
+
+      const createRepoResponse = await fetch('http://localhost:3000/api/repos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: repoName,
+          description: description || undefined,
+          private: isPrivate,
+          autoInit: true,
+        }),
+      });
+
+      if (!createRepoResponse.ok) {
+        const errorData = await createRepoResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to create repository (${createRepoResponse.status})`);
+      }
+
+      const { repo } = await createRepoResponse.json();
+      setCreatedRepoUrl(repo.htmlUrl);
+      setCreatedRepoId(repo.id);
+
+      setLogs((prev) => [
+        ...prev,
+        {
+          id: "2",
+          timestamp: new Date().toLocaleTimeString(),
+          message: `Repository created: ${repo.fullName}`,
+          type: "success",
+        },
+      ]);
+
+      // Fetch initial contents and commits
+      fetchRepoData(repo.id);
+
+      // Create schedule for commits
+      setLogs((prev) => [
+        ...prev,
+        {
+          id: "3",
+          timestamp: new Date().toLocaleTimeString(),
+          message: "Setting up commit schedule...",
+          type: "loading",
+        },
+      ]);
+
+      const scheduleResponse = await fetch('http://localhost:3000/api/schedules', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          repoId: repo.id,
+          commitsPerRun: Math.min(commitCount, 10), // Max 10 per run
+          frequency: 'daily',
+        }),
+      });
+
+      if (!scheduleResponse.ok) {
+        throw new Error('Failed to create schedule');
+      }
+
+      setLogs((prev) => [
+        ...prev,
+        {
+          id: "4",
+          timestamp: new Date().toLocaleTimeString(),
+          message: "Schedule created successfully!",
+          type: "success",
+        },
+        {
+          id: "5",
+          timestamp: new Date().toLocaleTimeString(),
+          message: `Repository is ready at: ${repo.htmlUrl}`,
+          type: "success",
+        },
+      ]);
+
+      setIsConfirming(false);
+      setRunComplete(true);
+    } catch (error: any) {
+      setLogs((prev) => [
+        ...prev,
+        {
+          id: String(prev.length + 1),
+          timestamp: new Date().toLocaleTimeString(),
+          message: `Error: ${error.message}`,
+          type: "error",
+        },
+      ]);
+      setIsConfirming(false);
+    }
+  }, [user, repoName, description, isPrivate, commitCount]);
 
   const handlePause = useCallback(() => {
     setIsPaused(!isPaused);
@@ -292,7 +412,12 @@ export default function Dashboard() {
                 <GitBranch className="w-5 h-5 text-primary" />
                 File Preview
               </h2>
-              <RepoPreviewList files={mockFiles} repoName={repoName} />
+              <div className="space-y-2">
+                {realFiles.length === 0 && (
+                  <p className="text-xs text-muted-foreground italic">Preview mode - Real structure will appear after creation</p>
+                )}
+                <RepoPreviewList files={realFiles.length > 0 ? realFiles : mockFiles} repoName={repoName} />
+              </div>
             </div>
 
             {/* Commit Timeline */}
@@ -301,7 +426,12 @@ export default function Dashboard() {
                 <Clock className="w-5 h-5 text-primary" />
                 Commit Timeline
               </h3>
-              <CommitTimeline commits={mockCommits} />
+              <div className="space-y-2">
+                {realCommits.length === 0 && (
+                  <p className="text-xs text-muted-foreground italic">Preview mode - Real commits will appear after creation</p>
+                )}
+                <CommitTimeline commits={realCommits.length > 0 ? realCommits : mockCommits} />
+              </div>
             </div>
           </div>
 
@@ -372,7 +502,7 @@ export default function Dashboard() {
                   <Button
                     variant="success"
                     className="flex-1 gap-2"
-                    onClick={() => window.open(`https://github.com/${user.username}/${repoName}`, "_blank")}
+                    onClick={() => window.open(createdRepoUrl || `https://github.com/${user.username}/${repoName}`, "_blank")}
                   >
                     <ExternalLink className="w-4 h-4" />
                     Open repository
