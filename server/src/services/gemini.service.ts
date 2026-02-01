@@ -16,9 +16,10 @@ export class GeminiService {
   async generateCommitMessage(data: {
     diff: string;
     context?: string;
+    projectDescription?: string;
     type?: 'conventional' | 'descriptive' | 'concise';
   }): Promise<{ suggestions: string[]; reasoning: string }> {
-    const { diff, context, type = 'conventional' } = data;
+    const { diff, context, projectDescription, type = 'conventional' } = data;
 
     let prompt = `You are a commit message expert. Analyze the following git diff and generate commit messages.
 
@@ -27,6 +28,10 @@ Git Diff:
 ${diff}
 \`\`\`
 `;
+
+    if (projectDescription) {
+      prompt += `\n\nProject Context:\n${projectDescription}\n`;
+    }
 
     if (context) {
       prompt += `\n\nAdditional Context:\n${context}\n`;
@@ -139,13 +144,25 @@ Provide your analysis in JSON format:
     }
   }
 
-  async generateCodeChanges(instruction: string): Promise<{
+  async generateCodeChanges(
+    instruction: string,
+    projectDescription?: string
+  ): Promise<{
     files: { path: string; content: string }[];
     explanation: string;
   }> {
-    const prompt = `Generate code changes based on this instruction:
+    let prompt = `Generate code changes based on this instruction:
 
-"${instruction}"
+"${instruction}"`;
+
+    if (projectDescription) {
+      prompt += `\n\nProject Context:
+"${projectDescription}"
+
+Use this project context to generate more relevant and appropriate code changes.`;
+    }
+
+    prompt += `
 
 Provide realistic code changes that would be committed to a repository.
 Return your response in JSON format:

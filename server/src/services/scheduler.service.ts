@@ -61,11 +61,15 @@ class SchedulerService {
       for (let i = 0; i < schedule.commitsPerRun; i++) {
         // Generate random code changes
         const instruction = this.generateRandomInstruction();
-        const changes = await geminiService.generateCodeChanges(instruction);
+        const changes = await geminiService.generateCodeChanges(
+          instruction,
+          schedule.repo.description || undefined
+        );
 
         // Generate commit message
         const commitMessageData = await geminiService.generateCommitMessage({
           diff: `Generated changes: ${changes.explanation}`,
+          projectDescription: schedule.repo.description || undefined,
           type: 'conventional',
         });
 

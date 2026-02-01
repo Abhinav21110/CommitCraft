@@ -113,6 +113,7 @@ export default function Dashboard() {
 
   // Settings state
   const [repoName, setRepoName] = useState("my-awesome-project");
+  const [description, setDescription] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [genre, setGenre] = useState("web");
   const [commitCount, setCommitCount] = useState(25);
@@ -267,6 +268,8 @@ export default function Dashboard() {
               <SettingsForm
                 repoName={repoName}
                 onRepoNameChange={setRepoName}
+                description={description}
+                onDescriptionChange={setDescription}
                 isPrivate={isPrivate}
                 onPrivateChange={setIsPrivate}
                 genre={genre}

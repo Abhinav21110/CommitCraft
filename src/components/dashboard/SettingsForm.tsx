@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -19,6 +20,8 @@ import { HelpCircle, Eye } from "lucide-react";
 interface SettingsFormProps {
   repoName: string;
   onRepoNameChange: (value: string) => void;
+  description: string;
+  onDescriptionChange: (value: string) => void;
   isPrivate: boolean;
   onPrivateChange: (value: boolean) => void;
   genre: string;
@@ -34,6 +37,8 @@ interface SettingsFormProps {
 export function SettingsForm({
   repoName,
   onRepoNameChange,
+  description,
+  onDescriptionChange,
   isPrivate,
   onPrivateChange,
   genre,
@@ -59,6 +64,23 @@ export function SettingsForm({
           placeholder="my-awesome-project"
           className="h-11"
         />
+      </div>
+
+      {/* Project Description */}
+      <div className="space-y-2">
+        <Label htmlFor="description" className="text-sm font-medium">
+          Project Description
+        </Label>
+        <Textarea
+          id="description"
+          value={description}
+          onChange={(e) => onDescriptionChange(e.target.value)}
+          placeholder="Describe your project to help AI generate relevant code, commits, and content... (e.g., A REST API for managing tasks with authentication and real-time updates)"
+          className="min-h-[100px] resize-none"
+        />
+        <p className="text-xs text-muted-foreground">
+          AI will use this description to generate contextually appropriate code and commits
+        </p>
       </div>
 
       {/* Visibility Toggle */}
